@@ -5,10 +5,10 @@ This script contains the functions for the differential equations used in the sy
 import numpy as np
 from generate_bile_salt_params import bile_salt_function, sum8_sin_func, param_sin_func
 
-# Load best-fit parameters (assumed to contain necessary constants)
+# Load params generated in generate_bile_salt_param
 best_parameters = np.load("params/best_parameters.npy")
 
-# Example time values and bile values for testing or analysis
+# example time series data
 t_values = np.linspace(0, 24, 1000)
 bile_values = [bile_salt_function(t) for t in t_values]
 
@@ -134,7 +134,7 @@ def Z_pH(pH, pH_opt, sigma_pH):
         sigma_pH: standard deviation for the penalty for Guassian curve
         
     @returns
-        pH-based environemental stres
+        pH-based environemental stress
     """
     return np.exp(-((pH - pH_opt) ** 2) / (2 * sigma_pH ** 2))
 
@@ -151,7 +151,7 @@ def Z_temp(T, T_opt, sigma_T):
         sigma_T: standard deviation for the penalty for Guassian curve
         
     @returns
-        pH-based environemental stres
+        pH-based environemental stress
     """
     return np.exp(-((T - T_opt) ** 2) / (2 * sigma_T ** 2))
 
@@ -176,14 +176,13 @@ def Z_bile(bile, bile_opt, sigma_bile):
     Equation:
         Z_bile = exp[-((bile - bile_opt)^2) / (2 * sigma_bile^2)]
     
-    
     @Params
         bile: current bile salt concentration
         bile_opt: optimal bile salt concentration
         sigma_bile: standard deviation for the penalty for Guassian curve
         
     @returns
-        Bile-based environemental stres
+        Bile-based environemental stress
     """
     return np.exp(-((bile - bile_opt) ** 2) / (2 * sigma_bile ** 2))
 
