@@ -1,3 +1,7 @@
+"""
+This script generates the parameters for the bile salt function.
+"""
+
 from scipy.optimize import minimize
 from scipy.integrate import odeint
 import numpy as np
