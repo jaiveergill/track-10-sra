@@ -7,6 +7,8 @@ from scipy.integrate import odeint
 import numpy as np
 import matplotlib.pyplot as plt
 
+np.random.seed(42)
+
 def box(t, a, b, k=10):
     """Smooth box function from a to b using sigmoids."""
     return 1 / (1 + np.exp(-k * (t - a))) - 1 / (1 + np.exp(-k * (t - b)))
