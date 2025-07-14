@@ -18,7 +18,7 @@ def mu(t, mu_max, F, N, K, epsilon, dS_dt):
     This is the specific growth rate which shows how the population grows per unit of population, so it is different from dN_dt
     
     Equation:
-        μ(t) = μ_max * F(t) * (1 - N(t)/K) - epsilon * (dS/dt)
+        mu(t) = mu_max * F(t) * (1 - N(t)/K) - epsilon * (dS/dt)
 
     @Params
         t: current time
@@ -40,7 +40,7 @@ def dN_dt(mu, N):
     This is the absolute growth rate, which is the absolute rate of change of the population in cells
 
     Equation:
-        dN/dt = µ * N(t)
+        dN/dt = mu * N(t)
     """
     return mu * N
 
@@ -104,11 +104,11 @@ def H(t, beta_max, D, R, S, K_s, E):
     Computes the rate of HGT
     
     Equation:
-        H(t) = (β_max * D(t) * R(t) * S(t)) / (K_s + S(t)) * (1 - E(t))
+        H(t) = (beta_max * D(t) * R(t) * S(t)) / (K_s + S(t)) * (1 - E(t))
     
     @Params
         t: current time
-        ß_max: maximum rate of HGT
+        beta_max: maximum rate of HGT
         D: amount of donor cells
         R: amount of recipient cells
         S: substrate concentration
