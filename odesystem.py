@@ -3,6 +3,7 @@ This script contains the functions for the differential equations used in the sy
 """
 
 import numpy as np
+import constants
 from generate_bile_salt_params import bile_salt_function, sum8_sin_func, param_sin_func
 
 # Load params generated in generate_bile_salt_param
@@ -136,7 +137,7 @@ def Z_pH(pH, pH_opt, sigma_pH):
     @returns
         pH-based environemental stress
     """
-    return np.exp(-((pH - pH_opt) ** 2) / (2 * sigma_pH ** 2))
+    return 1-np.exp(-((pH - pH_opt) ** 2) / (2 * sigma_pH ** 2))
 
 def Z_temp(T, T_opt, sigma_T):
     """
@@ -153,21 +154,8 @@ def Z_temp(T, T_opt, sigma_T):
     @returns
         pH-based environemental stress
     """
-    return np.exp(-((T - T_opt) ** 2) / (2 * sigma_T ** 2))
+    return 1-np.exp(-((T - T_opt) ** 2) / (2 * sigma_T ** 2))
 
-def bile_salt_function_differential_equation(x, t):
-    """
-    Differential equation describing the nonlinear oscillation of bile concentration over a 24 hour cycle.
-    Redefined from bile_salt_function for use in an ODE solver.
-    
-    @param x: a 1D array of length 2 of floats, where the first entry is the bile concentration and 
-              the second is a dummy variable tracking time (initially 0 at t=0).
-    @param t: nonnegative float, the time at which the derivative is evaluated.
-    @returns: a 1D array of length 2 of floats representing the derivative of bile concentration and the dummy variable.
-    """
-    bile, y = x  # bile concentration and dummy time variable
-    bile = sum8_sin_func(y, best_parameters)  # Compute bile based on sinusoidal model
-    return np.array([bile, 1])
 
 def Z_bile(bile, bile_opt, sigma_bile):
     """
@@ -184,7 +172,23 @@ def Z_bile(bile, bile_opt, sigma_bile):
     @returns
         Bile-based environemental stress
     """
-    return np.exp(-((bile - bile_opt) ** 2) / (2 * sigma_bile ** 2))
+    return 1-np.exp(-((bile - bile_opt) ** 2) / (2 * sigma_bile ** 2))
+
+
+def bile_salt_function_differential_equation(x, t, best_parameters=best_parameters):
+    """
+    Differential equation describing the nonlinear oscillation of bile concentration over a 24 hour cycle.
+    Redefined from bile_salt_function for use in an ODE solver.
+    
+    @param x: a 1D array of length 2 of floats, where the first entry is the bile concentration and 
+              the second is a dummy variable tracking time (initially 0 at t=0).
+    @param t: nonnegative float, the time at which the derivative is evaluated.
+    @returns: a 1D array of length 2 of floats representing the derivative of bile concentration and the dummy variable.
+    """
+    bile, y = x  # bile concentration and dummy time variable
+    bile = sum8_sin_func(y, best_parameters)  # Compute bile based on sinusoidal model
+    return np.array([bile, 1])
+
 
 def dD_dt(dN_dt, D, N, H_val, c_p):
     """
