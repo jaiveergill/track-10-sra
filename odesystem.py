@@ -14,118 +14,62 @@ best_parameters = np.load("params/best_parameters.npy")
 t_values = np.linspace(0, 24, 1000)
 bile_values = [bile_salt_function(t) for t in t_values]
 
-def mu(t, mu_max, F, N, K, epsilon, dS_dt):
+def mu(t, mu_max, F, S, K_s, m,):
     """
-    Computes the current growth rate of bacteria at a given time.
-    This is the specific growth rate which shows how the population grows per unit of population, so it is different from dN_dt
-    
     Equation:
-        mu(t) = mu_max * F(t) * (1 - N(t)/K) - epsilon * (dS/dt)
+        µ(t) = µ_max * F(t) * (S/K_s+S) - m
+        
+        µ_max * S/(K_s+S) - Monod term for growth
+        m - maintainance/death rate
 
-    @Params
-        t: current time
-        mu_max: maximum growth rate
-        F: fitness adjustment factor
-        N: total population
-        K: carrying capacity
-        epsilon: rate of bacteria leaving with the substrate
-        dS_dt: derivative of substrate concentration
-
-    @returns:
-        Growth rate
     """
-    return mu_max * F * (1 - N / K) - epsilon * dS_dt
+    return mu_max * F * (S / (K_s + S)) - m
 
-def dN_dt(mu, N):
+def dN_dt(mu, N, m, epsilon, S_out):
     """
     Computes the absolute rate of change of the population at time t
     This is the absolute growth rate, which is the absolute rate of change of the population in cells
 
     Equation:
-        dN/dt = mu * N(t)
+        dN/dt = (mu - m) * N - epsilon * S_out
+            mu: specific growth rate (1/time)
+            m: maintainance/death rate
+            N: population
+            episolon * S_out: amount of cells that are flushed out with substrate being flushed out
     """
-    return mu * N
+    return (mu - m) * N - epsilon*S_out
 
-def dS_dt(dN_dt, Y, S_in):
+def dS_dt(N, S, mu_max, K_s, Y, m, S_in):
     """
-    Computes the derivative of substrate concentration.
-    
+    Computes the rate of change of substrate concentration using Monod kinetics,
+    maintenance, and an external feed term.
+
     Equation:
-        dS/dt = - (1/Y) * dN/dt + S_in(t)
-    
-    @Params
-        dN_dt: derivative of the population
-        Y: biomass yield coefficient (number of cells produced by one gram of substrate so that 1/Y = substrate needed for one cell)
-        S_in: rate of substrate being added back into the system
-        TODO: Make S_in an oscillating function
-        
-    @returns
-        Substrate concentration rate of change
+        dS/dt = - (μ * N) / Y  -  m * N  +  S_in
     """
-    return - (1 / Y) * dN_dt + S_in
+    mu_ = mu_max * S / (K_s + S)
+    return - (mu_ * N) / Y - m * N + S_in
 
-def dF_dt(H_val, E, c_p):
+
+def dF_dt(H_val, E, c_p, F, k_F):
     """
-    Computes the rate of change of the fitness adjustment factor.
-    
     Equation:
-        dF/dt = H(t) * (1 - E(t)) * (1 - c_p)
-   
-    @Params
-        H_val: rate of horizontal gene transfer
-        E: environmental stress factor
-        c_p: the metabolic cost of the plasmid
-        
-    @returns
-        Fitness adjustment rate (float)
+        - dF/dt = H * (1-E) * (1-c_p) - k_F * F
+        HGT rate * stress * plasmid cost - decay value of fitness
     """
-    return H_val * (1 - E) * (1 - c_p)
+    growth = H_val * (1 - E) * (1 - c_p)
+    decay  = -k_F * F
+    return growth + decay
 
-def dE_dt(theta_pH, Z_pH_val, theta_temp, Z_temp_val, theta_bile, Z_bile_val):
+def dE_dt(theta_pH, Z_pH, theta_temp, Z_temp, theta_bile, Z_bile, E, k_E):
     """
-    Computes the rate of change of the environmental stress factor.
-    
     Equation:
-        dE/dt = theta_pH * Z_pH + theta_temp * Z_temp + theta_bile * Z_bile, constrained by [0, 1]
-    
-    @Params
-        theta_pH: weight for pH stress
-        theta_temp: weight for temperature stress
-        theta_bile: weight for bile stress
-        Z_pH_val: effect of pH on environemental stress
-        Z_temp_val: effect of temp on environemental stress
-        Z_bile_val: effect of bile on environemental stress
-        
-    @returns
-        Environmental stress rate
+        - dE/dt = (theta_pH*Z_pH + theta_temp*Z_temp + theta_bile*Z_bile) / (theta_pH + theta_temp + theta_bile) - decay
+        decay  = -k_E * E
     """
-    return (theta_pH * Z_pH_val + theta_temp * Z_temp_val + theta_bile * Z_bile_val) / 3 # I added divide by 3 to limit the term to [0, 1], might have to change this in paper as well
-
-def H(t, beta_max, D, R, S, K_s, E):
-    """
-    Computes the rate of HGT
-    
-    Equation:
-        H(t) = (beta_max * D(t) * R(t) * S(t)) / (K_s + S(t)) * (1 - E(t))
-    
-    @Params
-        t: current time
-        beta_max: maximum rate of HGT
-        D: amount of donor cells
-        R: amount of recipient cells
-        S: substrate concentration
-        K_s: half-saturation constant
-        E: environmental stress factor (computed from E(t))
-        
-    @returns
-        Horizontal gene transfer rate (float)
-    """
-    denominator = K_s + S
-    if denominator < 1e-8:
-        return 0.0
-    return (beta_max * D * R * S) / denominator * (1 - E)
-
-    # return (beta_max * D * R * S) / (K_s + S) * (1 - E)
+    raw_stress = (theta_pH*Z_pH + theta_temp*Z_temp + theta_bile*Z_bile) / (theta_pH + theta_temp + theta_bile)
+    decay   = -k_E * E
+    return raw_stress decay
 
 def Z_pH(pH, pH_opt, sigma_pH):
     """
@@ -173,7 +117,6 @@ def bile_salt_function_differential_equation(x, t):
     @returns: a 1D array of length 2 of floats representing the derivative of bile concentration and the dummy variable.
     """
     bile, y = x  # bile concentration and dummy time variable
-    
     bile = sum8_sin_func(y, best_parameters)  # Compute bile based on sinusoidal model
     return np.array([bile, 1])
 
@@ -194,39 +137,23 @@ def Z_bile(bile, bile_opt, sigma_bile):
     """
     return np.exp(-((bile - bile_opt) ** 2) / (2 * sigma_bile ** 2))
 
-def dD_dt(dN_dt, D, N, H_val, c_p):
+def H(t, beta_max, D, R, S, K_s, E, K_c):
     """
-    Computes the derivative of the donor cell population.
-    
     Equation:
-        dD/dt = (1 - c_p) * dN/dt * (D/N) + H(t)
-   
-    @Params
-        dN_dt: derivative of the total population
-        D: donor cell population at the time t
-        N: total cell population at the time t
-        H_val: rate of HGT
-        c_p: the metabolic cost of the plasmid
-        
-    @returns
-        Donor cell population derivative (float)
-    """
-    return (1 - c_p) * dN_dt * (D / N) + H_val
+        H(t) = ß_max * (D*R/(K_c + D*R))
+        * ((S/(K_s+S))) (monod)
+        * (1-E) (stress term)
 
-def dR_dt(dN_dt, R, N, H_val):
     """
-    Computes the derivative of the recipient cell population.
-    
-    Equation:
-        dR/dt = dN/dt * (R/N) - H(t)
-    
-    @Params
-        dN_dt: derivative of the total population
-        R: recipient cell population at the time t
-        N: total cell population at the time t
-        H_val: rate of HGT
-        
-    @returns
-        Recipient cell population derivative (float)
-    """
-    return dN_dt * (R / N) - H_val
+    return beta_max * D * R / (K_c + D * R) * S / (K_s + S) * (1 - E)
+
+
+def dD_dt(mu, D, H_val, c_p, lambda_):
+
+    return mu * (1 - c_p) * D + H_val - lambda_ * D
+
+
+def dR_dt(mu, R, H_val, lambda_, D):
+
+    return mu * R - H_val + lambda_ * D
+
