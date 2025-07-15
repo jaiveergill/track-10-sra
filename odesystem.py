@@ -69,7 +69,7 @@ def dE_dt(theta_pH, Z_pH, theta_temp, Z_temp, theta_bile, Z_bile, E, k_E):
     """
     raw_stress = (theta_pH*Z_pH + theta_temp*Z_temp + theta_bile*Z_bile) / (theta_pH + theta_temp + theta_bile)
     decay   = -k_E * E
-    return raw_stress decay
+    return raw_stress + decay
 
 def Z_pH(pH, pH_opt, sigma_pH):
     """
