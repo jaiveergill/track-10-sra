@@ -77,7 +77,7 @@ def ecoli_system(t, y):
     Z_bile_val = Z_bile(bile, BILE_OPT, SIGMA_BILE)
 
     #4
-    dE_dt_val = dE_dt(THETA_PH, Z_pH_val, THETA_TEMP, Z_temp_val, THETA_BILE, Z_bile_val)
+    dE_dt_val = dE_dt(THETA_PH, Z_pH_val, THETA_TEMP, Z_temp_val, THETA_BILE, Z_bile_val, 100, 0.01)
     # E = max(0.0, min(E, 0.99))
     E += dE_dt_val
     E = np.clip(E, 0.0, 0.99)  # Constrain E to [0, 0.99]
