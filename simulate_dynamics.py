@@ -164,12 +164,12 @@ F(t) and E(t)
 S(t) and maybe H(t) (recompute H at each t if needed)
 '''
 t = solution.t
-N_vals, D_vals, R_vals, S_vals, F_vals, E_vals, dummy_vals = solution.y
+dN_dt_vals, dD_dt_vals, dR_dt_vals, dS_dt_vals, dF_dt_vals, dE_dt_vals, dy_dummy_dt = solution.y
 
 plt.figure(figsize=(10, 6))
-plt.plot(t, N_vals, label="Total Population (N)")
-plt.plot(t, D_vals, label="Donor Cells (D)")
-plt.plot(t, R_vals, label="Recipient Cells (R)")
+plt.plot(t, dN_dt_vals, label="Total Population (N)")
+plt.plot(t, dD_dt_vals, label="Donor Cells (D)")
+plt.plot(t, dR_dt_vals, label="Recipient Cells (R)")
 plt.xlabel("Time (hours)")
 plt.ylabel("Cell Count")
 plt.title("Bacterial Population Dynamics")
@@ -178,9 +178,9 @@ plt.grid(True)
 plt.show()
 
 plt.figure()
-plt.plot(t, F_vals, label="Fitness (F)")
-plt.plot(t, E_vals, label="Environmental Stress (E)")
-plt.plot(t, S_vals, label="Substrate (S)")
+plt.plot(t, dF_dt_vals, label="Fitness (F)")
+plt.plot(t, dE_dt_vals, label="Environmental Stress (E)")
+plt.plot(t, dS_dt_vals, label="Substrate (S)")
 plt.legend()
 plt.title("Fitness, Stress, and Substrate over Time")
 plt.grid(True)

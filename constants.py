@@ -13,9 +13,9 @@ CARRYING_CAPACITY = 1e9
 EPSILON = 0.01
 INITIAL_N = 1e6
 
-YIELD = 0.1 #was 0.5, was 0.1
-S_IN = 10.0 #was 1.0
-INITIAL_S = 10.0 #WAS 1.0
+YIELD = 0.5 #was 0.5, was 0.1
+S_IN = 1.0 #was 1.0
+INITIAL_S = 1.0 #WAS 1.0
 
 INITIAL_F = 1.0
 CP = 0.1
