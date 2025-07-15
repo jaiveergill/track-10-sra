@@ -120,7 +120,12 @@ def H(t, beta_max, D, R, S, K_s, E):
     @returns
         Horizontal gene transfer rate (float)
     """
-    return (beta_max * D * R * S) / (K_s + S) * (1 - E)
+    denominator = K_s + S
+    if denominator < 1e-8:
+        return 0.0
+    return (beta_max * D * R * S) / denominator * (1 - E)
+
+    # return (beta_max * D * R * S) / (K_s + S) * (1 - E)
 
 def Z_pH(pH, pH_opt, sigma_pH):
     """
@@ -168,6 +173,7 @@ def bile_salt_function_differential_equation(x, t):
     @returns: a 1D array of length 2 of floats representing the derivative of bile concentration and the dummy variable.
     """
     bile, y = x  # bile concentration and dummy time variable
+    
     bile = sum8_sin_func(y, best_parameters)  # Compute bile based on sinusoidal model
     return np.array([bile, 1])
 
