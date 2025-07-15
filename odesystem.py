@@ -14,17 +14,6 @@ best_parameters = np.load("params/best_parameters.npy")
 t_values = np.linspace(0, 24, 1000)
 bile_values = [bile_salt_function(t) for t in t_values]
 
-def mu(t, mu_max, F, S, K_s, m,):
-    """
-    Equation:
-        µ(t) = µ_max * F(t) * (S/K_s+S) - m
-        
-        µ_max * S/(K_s+S) - Monod term for growth
-        m - maintainance/death rate
-
-    """
-    return mu_max * F * (S / (K_s + S))
-
 def dN_dt(mu, N, m, epsilon, S_out):
     """
     Computes the absolute rate of change of the population at time t
@@ -37,7 +26,7 @@ def dN_dt(mu, N, m, epsilon, S_out):
             N: population
             episolon * S_out: amount of cells that are flushed out with substrate being flushed out
     """
-    return (mu - m) * N - epsilon*S_out
+    return (mu_max * F * (S / (K_s + S)) - m) * N - epsilon*S_out
 
 def dS_dt(N, S, mu_max, K_s, Y, m, S_in):
     """
