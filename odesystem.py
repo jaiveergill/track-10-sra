@@ -23,7 +23,7 @@ def mu(t, mu_max, F, S, K_s, m,):
         m - maintainance/death rate
 
     """
-    return mu_max * F * (S / (K_s + S)) - m
+    return mu_max * F * (S / (K_s + S))
 
 def dN_dt(mu, N, m, epsilon, S_out):
     """
