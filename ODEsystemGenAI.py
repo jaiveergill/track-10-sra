@@ -58,7 +58,7 @@ def ode_system(z, y):
     return [dNdz, dSdz, dEdz, dFdz, dHdz, d_dummy]
 
 # ─── Initial conditions and integration ───
-y0 = [0.01, 2.1, 0.5, 0.9, 1.0, 1.0]  # [N, S, E, F, H, dummy]
+y0 = [0.01, 2.1, 0.5, 0.9, 1.0, 0.0]  # [N, S, E, F, H, dummy]
 z_span = (0, 24)
 z_eval = np.linspace(0, 24, 1000)
 
