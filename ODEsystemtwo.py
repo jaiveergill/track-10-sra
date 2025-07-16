@@ -27,17 +27,17 @@ def bile_salt_derivative(y_dummy):
 # Parameters
 mu_max = 1.0    # 1/h, max growth rate
 K = 1.0         # carrying capacity (normalized)
-Y = 0.6         # yield coefficient (biomass per substrate) (0.45-0.6)
+Y = 0.5       # yield coefficient (biomass per substrate) (0.45-0.6)
 epsilon = 0.05  # coupling of substrate change to growth
 theta1 = -1.0 / Y   # -2.0 with Y=0.5
 theta2 = 0.14  # bile influence on substrate
 theta3 = -0.05  # bile influence on HGT environment (negative = inhibitory)
 theta4 = 0.325  # baseline environment drift
-theta5 = 0.1    # coupling for H factor
+theta5 = 1e-4    # coupling for H factor
 c = 0.1         # plasmid metabolic cost
 
 # Initial conditions
-N0 = 0.01; S0 = 3.1; E0 = 0.5; F0 = 0.9; H0 = 1.0
+N0 = 0.01; S0 = 1.1; E0 = 0.5; F0 = 0.9; H0 = 1.0
 y0 = [N0, S0, E0, F0, H0, 1.4, 0.0]
 
 # ODE system definition
@@ -46,7 +46,7 @@ def ode_system(t, y):
     # Bile and its rate of change at time t
     dB_dt = bile_salt_derivative(y_dummy)
     # Substrate dynamics
-    dS_dt = theta1 * N * F* S / (1 + S) * mu_max + theta2 * dB_dt  # consumption + bile-driven input
+    dS_dt = theta1 * N * S / (1 + S) * mu_max + theta2 * dB_dt  # consumption + bile-driven input
     # Bacterial population
     # dN_dt = mu_max * N * F * (1 - N/K) - epsilon * dS_dt
     dN_dt = mu_max * N * F * (S / (1 + S)) - epsilon * dS_dt
