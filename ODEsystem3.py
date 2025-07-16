@@ -3,7 +3,7 @@ from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 from generate_bile_salt_params import param_sin_func
 
-#bile salt concentration model
+#BILE SALT MODEL
 best_parameters = np.load("params/best_parameters.npy")
 def sum8_sin_func(t, parameters=best_parameters):
     sin1 = param_sin_func(t, parameters[:3])
@@ -23,7 +23,7 @@ def bile_salt_derivative(y_dummy):
     """
     return sum8_sin_func(y_dummy % 24, best_parameters)
 
-#defining our parameters
+#PARAMETER DEFINITIONS
 mu_max = 1.0    #in 1/h, max growth rate
 K = 1.0         #carrying capacity (normalized)
 Y = 0.5       #yield coefficient (biomass per substrate) (0.45-0.6)
@@ -35,32 +35,16 @@ theta4 = 0.325  #baseline environment drift, need to make a function of pH and t
 theta5 = 1e-4    #coupling for H factor
 c = 0.1         #plasmid metabolic cost
 
-#defining our initial conditions
+#INITIAL CONDITIONS
 N0 = 0.01; S0 = 1.1; E0 = 0.5; F0 = 0.9; H0 = 1.0
 y0 = [N0, S0, E0, F0, H0, 1.4, 0.0]
-
-#scenario parameters you can tweak ===
-scenarios = {
-    "Beneficial Plasmid": {
-        "c": -0.1,
-        "theta3": -0.02,
-        "theta4": 0.4,
-        "theta5": 1e-3
-    },
-    "Deleterious Plasmid": {
-        "c": 0.1,
-        "theta3": -0.05,
-        "theta4": 0.325,
-        "theta5": 1e-4
-    }
-}
 
 #THETA FOUR FUNCTION 
 # physiological optima
 PH_OPT       = 6.8
 TEMP_OPT     = 37.0
 
-# width of sensitivity
+#width of sensitivity
 SIGMA_PH_DR  = 0.5   #pH units
 SIGMA_TEMP_DR= 2.0   #°C
 
@@ -80,8 +64,10 @@ def baseline_drift(pH, temp,
     temp_term = np.exp(-((temp - temp_opt)**2)/(2 * sigma_temp**2))
     return theta4_max * ph_term * temp_term
 
-ENV_pH   = 6.8    # or whatever you want to test
-ENV_temp = 37.0 
+#testing conditions
+ENV_pH   = 6.8   
+ENV_temp = 38.0 
+
 
 #ODE system definition
 def ode_system(t, y):
@@ -119,14 +105,31 @@ fig.suptitle("State Variables Over 24 Hours")
 plt.tight_layout(rect=[0, 0, 1, 0.96])
 plt.show()
 
+theta4good = baseline_drift(6.0, 35.0)
+theta4bad = baseline_drift(7.0, 45.0)
+#SCENARIO FOR CHANGING PARAMETERS 
+scenarios = {
+    "Beneficial Plasmid": {
+        "c": 0,
+        "theta3": 0,
+        "theta4": 0,
+        "theta5": 0
+    },
+    "Deleterious Plasmid": {
+        "c": 1,
+        "theta3": 1,
+        "theta4": 1,
+        "theta5": 1e-3
+    }
+}
 
 # === Generate two separate plots ===
 for name, params in scenarios.items():
     # set scenario-specific globals
-    current_c = params["c"]
-    current_theta3 = params["theta3"]
-    current_theta4 = params["theta4"]
-    current_theta5 = params["theta5"]
+    c = params["c"]
+    theta3 = params["theta3"]
+    theta4 = params["theta4"]
+    theta5 = params["theta5"]
     
     sol = solve_ivp(ode_system, t_span, y0, t_eval=t_eval,
                     method="RK45", rtol=1e-6, atol=1e-9)
