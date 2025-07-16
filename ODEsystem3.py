@@ -31,7 +31,7 @@ epsilon = 0.05  #coupling of substrate change to growth
 theta1 = -1.0 / Y   #-2.0 with Y=0.5
 theta2 = 0.14  #bile influence on substrate
 theta3 = -0.05  #bile influence on HGT environment (negative = inhibitory)
-theta4 = 0.325  #baseline environment drift, need to make a function of pH and temp 
+#theta4 = 0.325  #baseline environment drift, need to make a function of pH and temp 
 theta5 = 1e-4    #coupling for H factor
 c = 0.1         #plasmid metabolic cost
 
@@ -65,8 +65,9 @@ def baseline_drift(pH, temp,
     return theta4_max * ph_term * temp_term
 
 #testing conditions
-ENV_pH   = 6.8   
-ENV_temp = 38.0 
+ENV_pH   = 7.0   
+ENV_temp = 38.5
+theta4 = baseline_drift(ENV_pH, ENV_temp)
 
 
 #ODE system definition
@@ -80,7 +81,6 @@ def ode_system(t, y):
     #growth rate 
     dN_dt = mu_max * N * F * (S / (1 + S)) - epsilon * dS_dt
     #HGT environment factor
-    theta4 = baseline_drift(ENV_pH, ENV_temp)
     dE_dt = theta3 * B  + theta4
     #plasmid-free factor
     dF_dt = H * (1 - E) * (1 - c)
@@ -105,25 +105,26 @@ fig.suptitle("State Variables Over 24 Hours")
 plt.tight_layout(rect=[0, 0, 1, 0.96])
 plt.show()
 
-theta4good = baseline_drift(6.0, 35.0)
-theta4bad = baseline_drift(7.0, 45.0)
+theta4good = baseline_drift(6.8, 38.0)
+theta4bad = baseline_drift(7.0, 38.5)
+
 #SCENARIO FOR CHANGING PARAMETERS 
 scenarios = {
     "Beneficial Plasmid": {
-        "c": 0,
-        "theta3": 0,
-        "theta4": 0,
-        "theta5": 0
+        "c": 0.1,
+        "theta3": -0.05,
+        "theta4": theta4good,
+        "theta5": 1e-3
     },
     "Deleterious Plasmid": {
-        "c": 1,
-        "theta3": 1,
-        "theta4": 1,
+        "c": 0.1,
+        "theta3": -0.05,
+        "theta4": theta4bad,
         "theta5": 1e-3
     }
 }
 
-# === Generate two separate plots ===
+#generating the different plots 
 for name, params in scenarios.items():
     # set scenario-specific globals
     c = params["c"]
@@ -143,11 +144,12 @@ for name, params in scenarios.items():
     growth_rate = mu_max * N_vals * sol.y[3] * (S_vals / (1 + S_vals)) - epsilon * dS_vals
     
     # plot
-    plt.figure(figsize=(8, 4))
+    # plt.figure(figsize=(8, 4))
     plt.plot(sol.t, growth_rate, linewidth=2)
-    plt.title(f"Growth Rate: {name}")
-    plt.xlabel("Time (hours)")
-    plt.ylabel("dN/dt")
-    plt.grid(True)
-    plt.tight_layout()
-    plt.show()
+
+plt.title(f"Growth Rate: Good and Bad Plasmids")
+plt.xlabel("Time (hours)")
+plt.ylabel("dN/dt")
+plt.grid(True)
+plt.tight_layout()
+plt.show()
