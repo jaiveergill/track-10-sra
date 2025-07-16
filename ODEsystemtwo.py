@@ -31,12 +31,26 @@ epsilon = 0.05  #coupling of substrate change to growth
 theta1 = -1.0 / Y   #-2.0 with Y=0.5
 theta2 = 0.14  #bile influence on substrate
 theta3 = -0.05  #bile influence on HGT environment (negative = inhibitory)
-theta4 = 0.325  #baseline environment drift
 theta5 = 1e-4    #coupling for H factor
 c = 0.1         #plasmid metabolic cost
 
+
+pH = 6.6
+T = 37
+
+def theta4(pH, T,
+           pH_opt=6.8,
+           T_opt=37.0,
+           sigma_ph=0.42,
+           sigma_temp=6.4,
+          ):
+    pH_factor   = np.exp(-((pH - pH_opt)**2)/(2*sigma_ph**2))
+    temp_factor = np.exp(-((T   - T_opt)**2)/(2*sigma_temp**2))
+    return temp_factor + pH_factor
+
+
 #defining our initial conditions
-N0 = 0.01; S0 = 1.1; E0 = 0.5; F0 = 0.9; H0 = 1.0
+N0 = 0.2; S0 = 1.1; E0 = 0; F0 = 0.3; H0 = 0.1
 y0 = [N0, S0, E0, F0, H0, 1.4, 0.0]
 
 #ODE system definition
@@ -48,9 +62,9 @@ def ode_system(t, y):
     #substrate dynamics
     dS_dt = theta1 * N * S / (1 + S) * mu_max + theta2 * dB_dt  #consumption + bile-driven input
     #growth rate 
-    dN_dt = mu_max * N * F * (S / (1 + S)) - epsilon * dS_dt
+    dN_dt = mu_max * N * (S / (1 + S)) - epsilon * dS_dt
     #HGT environment factor
-    dE_dt = theta3 * B  + theta4
+    dE_dt = theta3 * B + (1-theta4(pH, T))
     #plasmid-free factor
     dF_dt = H * (1 - E) * (1 - c)
     #host factor
@@ -59,8 +73,8 @@ def ode_system(t, y):
     return [dN_dt, dS_dt, dE_dt, dF_dt, dH_dt, dB_dt, dy_dummy_dt]
 
 #integrating from t=0 to t=24 hours
-t_span = (0, 24)
-t_eval = np.linspace(0, 24, 1000)
+t_span = (0,96)
+t_eval = np.linspace(0,96, 1000)
 sol = solve_ivp(ode_system, t_span, y0, t_eval=t_eval, dense_output=False)
 
 #plot all state variables in subplots (this just for now to understand our dynamic variables)
