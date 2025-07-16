@@ -79,9 +79,9 @@ def ode_system(t, y):
     #growth rate 
     dN_dt = mu_max * N * F * (S / (1 + S)) - epsilon * dS_dt
     #HGT environment factor
-    dE_dt = theta3 * B
+    dE_dt = theta3 * dB_dt
     #plasmid-free factor
-    dF_dt = H * (1 - E) * (1 - c)
+    dF_dt = H * (1 - E) * (1 - c) - F*0.15 #  linear decay term
     #host factor
     dH_dt = theta5 * N * dS_dt * E
     dy_dummy_dt = 1.0
@@ -90,7 +90,7 @@ def ode_system(t, y):
 #integrating from t=0 to t=24 hours
 t_span = (0, 24)
 t_eval = np.linspace(0, 24, 1000)
-sol = solve_ivp(ode_system, t_span, y0, t_eval=t_eval, dense_output=False)
+sol = solve_ivp(ode_system, t_span, y0, t_eval=t_eval, dense_output=False, method="BDF")
 
 # Plot all state variables for the base simulation (for reference)
 labels = ['N', 'S', 'E', 'F', 'H', 'B', 'y_dummy']
