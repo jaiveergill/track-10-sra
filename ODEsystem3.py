@@ -94,17 +94,6 @@ t_span = (0, 24)
 t_eval = np.linspace(0, 24, 1000)
 sol = solve_ivp(ode_system, t_span, y0, t_eval=t_eval, dense_output=False)
 
-#plot all state variables in subplots (this just for now to understand our dynamic variables)
-labels = ['N','S','E','F','H','B','y_dummy']
-fig, axs = plt.subplots(len(labels), 1, figsize=(8, 2*len(labels)), sharex=True)
-for i, label in enumerate(labels):
-    axs[i].plot(sol.t, sol.y[i], label=label)
-    axs[i].set_ylabel(label)
-axs[-1].set_xlabel("Time (hours)")
-fig.suptitle("State Variables Over 24 Hours")
-plt.tight_layout(rect=[0, 0, 1, 0.96])
-plt.show()
-
 theta4good = baseline_drift(6.8, 38.0)
 theta4bad = baseline_drift(7.0, 38.5)
 
@@ -124,9 +113,9 @@ scenarios = {
     }
 }
 
-#generating the different plots 
+# store sols for each scenario
+solutions = {}
 for name, params in scenarios.items():
-    # set scenario-specific globals
     c = params["c"]
     theta3 = params["theta3"]
     theta4 = params["theta4"]
@@ -134,22 +123,33 @@ for name, params in scenarios.items():
     
     sol = solve_ivp(ode_system, t_span, y0, t_eval=t_eval,
                     method="RK45", rtol=1e-6, atol=1e-9)
-    
-    # compute growth rate
+    solutions[name] = sol
+
+plt.figure(figsize=(8, 4))
+for name, sol in solutions.items():
     N_vals = sol.y[0]
     S_vals = sol.y[1]
-    y_dummy_vals = sol.y[6]
-    dB_vals = bile_salt_derivative(y_dummy_vals)
+    dB_vals = bile_salt_derivative(sol.y[6])
     dS_vals = theta1 * N_vals * S_vals / (1 + S_vals) * mu_max + theta2 * dB_vals
     growth_rate = mu_max * N_vals * sol.y[3] * (S_vals / (1 + S_vals)) - epsilon * dS_vals
-    
-    # plot
-    # plt.figure(figsize=(8, 4))
-    plt.plot(sol.t, growth_rate, linewidth=2)
-
-plt.title(f"Growth Rate: Good and Bad Plasmids")
+    plt.plot(sol.t, growth_rate, linewidth=2, label=name)
+plt.title("Growth Rate Across Scenarios")
 plt.xlabel("Time (hours)")
 plt.ylabel("dN/dt")
 plt.grid(True)
+plt.legend()
 plt.tight_layout()
+plt.show()
+
+labels = ['N', 'S', 'E', 'F', 'H', 'B']
+fig, axs = plt.subplots(len(labels), 1, figsize=(8, 2*len(labels)), sharex=True)
+for i, label in enumerate(labels):
+    for name, sol in solutions.items():
+        axs[i].plot(sol.t, sol.y[i], label=name)
+    axs[i].set_ylabel(label)
+    axs[i].grid(True)
+axs[-1].set_xlabel("Time (hours)")
+fig.suptitle("State Variables Across Scenarios")
+axs[0].legend()
+plt.tight_layout(rect=[0, 0, 1, 0.96])
 plt.show()
