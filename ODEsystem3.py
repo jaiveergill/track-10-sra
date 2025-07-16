@@ -67,11 +67,9 @@ def baseline_drift(pH, temp,
 #testing conditions
 ENV_pH   = 7.0   
 ENV_temp = 38.5
-theta4 = baseline_drift(ENV_pH, ENV_temp)
-
 
 #ODE system definition
-def ode_system(t, y):
+def ode_system(t, y, theta3=theta3, theta4=baseline_drift(ENV_pH, ENV_temp), theta5=theta5):
 
     N, S, E, F, H, B, y_dummy = y
     #bile and its rate of change at time t
@@ -81,7 +79,7 @@ def ode_system(t, y):
     #growth rate 
     dN_dt = mu_max * N * F * (S / (1 + S)) - epsilon * dS_dt
     #HGT environment factor
-    dE_dt = theta3 * B  + theta4
+    dE_dt = theta3 * B + (1-theta4)
     #plasmid-free factor
     dF_dt = H * (1 - E) * (1 - c)
     #host factor
@@ -95,7 +93,7 @@ t_eval = np.linspace(0, 24, 1000)
 sol = solve_ivp(ode_system, t_span, y0, t_eval=t_eval, dense_output=False)
 
 theta4good = baseline_drift(6.8, 38.0)
-theta4bad = baseline_drift(7.0, 38.5)
+theta4bad = baseline_drift(6.8, 38.5)
 
 #SCENARIO FOR CHANGING PARAMETERS 
 scenarios = {
@@ -121,7 +119,7 @@ for name, params in scenarios.items():
     theta4 = params["theta4"]
     theta5 = params["theta5"]
     
-    sol = solve_ivp(ode_system, t_span, y0, t_eval=t_eval,
+    sol = solve_ivp(ode_system, t_span, y0, args=(theta3, theta4, theta5), t_eval=t_eval,
                     method="RK45", rtol=1e-6, atol=1e-9)
     solutions[name] = sol
 
