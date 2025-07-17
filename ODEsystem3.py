@@ -37,17 +37,17 @@ epsilon = 0.05
 #-2.0 with Y=0.5
 theta1 = -1.0 / Y  
 #bile influence on substrate
-theta2 = 0.14  
+theta2 = 0.09
 #bile influence on HGT environment (negative = inhibitory)
 theta3 = -0.1  
 #coupling for H factor
-theta5 = 1e-4    
+theta5 = 1e-4
 #plasmid metabolic cost
 c = 0.1         
 
 #INITIAL CONDITIONS
 
-N0 = 0.01; S0 = 1.1; E0 = 0.5; F0 = 0.9; H0 = 1.0
+N0 = 0.1; S0 = 1.1; E0 = 0.5; F0 = 0.9; H0 = 0.5
 y0 = [N0, S0, E0, F0, H0, 1.4, 0.0]
 
 #THETA FOUR FUNCTION 
@@ -55,6 +55,7 @@ y0 = [N0, S0, E0, F0, H0, 1.4, 0.0]
 # physiological optima
 PH_OPT       = 6.8
 TEMP_OPT     = 37.0
+K_S = 1
 
 #width of sensitivity
 SIGMA_PH_DR  = 0.5   #pH units
@@ -85,15 +86,15 @@ def ode_system(t, y):
     #bile and its rate of change at time t
     dB_dt = bile_salt_derivative(y_dummy)
     #substrate dynamics
-    dS_dt = theta1 * N * S / (1 + S) * mu_max + theta2 * dB_dt  #consumption + bile-driven input
+    dS_dt = theta1 * N * S / (K_S + S) * mu_max + theta2 * dB_dt  #consumption + bile-driven input
     #growth rate 
-    dN_dt = mu_max * N * F * (S / (1 + S)) - epsilon * dS_dt
+    dN_dt = mu_max * N * F * (S / (K_S + S)) - epsilon * dS_dt
     #HGT environment factor
     dE_dt = theta3 * dB_dt
     #plasmid-free factor
-    dF_dt = H * (1 - E) * (1 - c) - F*0.15 #  linear decay term
+    dF_dt = H * (1 - E) * (1 - c) - F * 0.15 #  linear decay term
     #host factor
-    dH_dt = theta5 * N * dS_dt * E
+    dH_dt = theta5 * N * S/(K_S + S) * (1-E)
     dy_dummy_dt = 1.0
     return [dN_dt, dS_dt, dE_dt, dF_dt, dH_dt, dB_dt, dy_dummy_dt]
 
