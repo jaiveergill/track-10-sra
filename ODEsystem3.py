@@ -31,12 +31,12 @@ epsilon = 0.05  #coupling of substrate change to growth
 theta1 = -1.0 / Y   #-2.0 with Y=0.5
 theta2 = 0.14  #bile influence on substrate
 theta3 = -0.05  #bile influence on HGT environment (negative = inhibitory)
-theta4 = 0.325  #baseline environment drift, need to make a function of pH and temp 
+#theta4 = 0.325  #baseline environment drift, need to make a function of pH and temp 
 theta5 = 1e-4    #coupling for H factor
 c = 0.1         #plasmid metabolic cost
 
 #INITIAL CONDITIONS
-N0 = 0.01; S0 = 1.1; E0 = 0.325; F0 = 0.9; H0 = 1.0
+N0 = 0.01; S0 = 1.1; E0 = 0.5; F0 = 0.9; H0 = 1.0
 y0 = [N0, S0, E0, F0, H0, 1.4, 0.0]
 
 #THETA FOUR FUNCTION 
@@ -69,7 +69,6 @@ ENV_pH   = 7.0
 ENV_temp = 38.5
 theta4 = baseline_drift(ENV_pH, ENV_temp)
 
-
 #ODE system definition
 def ode_system(t, y):
     N, S, E, F, H, B, y_dummy = y
@@ -80,7 +79,7 @@ def ode_system(t, y):
     #growth rate 
     dN_dt = mu_max * N * F * (S / (1 + S)) - epsilon * dS_dt
     #HGT environment factor
-    dE_dt = theta3 * B  + theta4
+    dE_dt = theta3 * dB_dt
     #plasmid-free factor
     dF_dt = H * (1 - E) * (1 - c) - F*0.15 #  linear decay term
     #host factor
@@ -130,28 +129,14 @@ for name, params in scenarios.items():
     theta3 = params["theta3"]
     theta4 = params["theta4"]
     theta5 = params["theta5"]
+    # Adjust initial E value dynamically based on theta4
+    y0_scenario = [N0, S0, (1 - theta4)*10, F0, H0, 1.4, 0.0]
     
-    sol = solve_ivp(ode_system, t_span, y0, t_eval=t_eval,
-                    method="RK45", rtol=1e-6, atol=1e-9)
-    solutions[name] = sol
+    sol_scenario = solve_ivp(ode_system, t_span, y0_scenario, t_eval=t_eval,
+                             method="RK45", rtol=1e-6, atol=1e-9)
+    solutions[name] = sol_scenario
 
-plt.figure(figsize=(8, 4))
-for name, sol in solutions.items():
-    N_vals = sol.y[0]
-    S_vals = sol.y[1]
-    dB_vals = bile_salt_derivative(sol.y[6])
-    dS_vals = theta1 * N_vals * S_vals / (1 + S_vals) * mu_max + theta2 * dB_vals
-    growth_rate = mu_max * N_vals * sol.y[3] * (S_vals / (1 + S_vals)) - epsilon * dS_vals
-    plt.plot(sol.t, growth_rate, linewidth=2, label=name)
-plt.title("Growth Rate Across Scenarios")
-plt.xlabel("Time (hours)")
-plt.ylabel("dN/dt")
-plt.grid(True)
-plt.legend()
-plt.tight_layout()
-plt.show()
-
-labels = ['N', 'S', 'E', 'F', 'H', 'B']
+# Plot all state variables for each scenario using subplots
 fig, axs = plt.subplots(len(labels), 1, figsize=(8, 2*len(labels)), sharex=True)
 for i, label in enumerate(labels):
     for scenario, sol_scenario in solutions.items():
