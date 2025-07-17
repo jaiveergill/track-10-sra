@@ -75,7 +75,7 @@ def baseline_drift(pH, temp,
 theta4 = baseline_drift(PH_OPT, TEMP_OPT)
 
 #O DE SYSTEM DEFINITION
-def ode_system(t, y, theta2_=theta2, theta3_=theta3, theta5_=theta5, c_=c, theta4_val=theta4):
+def ode_system(t, y, theta2_=theta2, theta3_=theta3, theta5_=theta5, c=c, theta4_val=theta4):
     """
     need big docstring here
     """
@@ -84,7 +84,7 @@ def ode_system(t, y, theta2_=theta2, theta3_=theta3, theta5_=theta5, c_=c, theta
     dS_dt = theta1 * N * S / (K_S + S) * mu_max + theta2_ * dB_dt
     dN_dt = mu_max * N * F * (S / (K_S + S)) - epsilon * dS_dt
     dE_dt = theta3_ * dB_dt * theta4_val
-    dF_dt = H * (1 - E) * (1 - c_) - F * 0.15
+    dF_dt = H * (1 - E) * (1 - c) - F * 0.15
     dH_dt = theta5_ * N * S/(K_S + S)
     dy_dummy_dt = 1.0
     return [dN_dt, dS_dt, dE_dt, dF_dt, dH_dt, dB_dt, dy_dummy_dt]
@@ -95,7 +95,7 @@ t_span = (0, 24*days)
 t_eval = np.linspace(0, 24*days, 1000)
 
 if __name__ == "__main__":
-    sol = solve_ivp(ode_system, t_span, y0, t_eval=t_eval, dense_output=False, method="BDF")
+    sol = solve_ivp(ode_system, t_span, y0, _eval=t_eval, dense_output=False, method="BDF")
 
     # Plot all state variables for the base simulation (for reference)
     labels = ['N', 'S', 'E', 'F', 'H', 'B', 'y_dummy']
@@ -173,13 +173,13 @@ if __name__ == "__main__":
             "theta5": 1e-4
         },
         "PLASMID 9": {
-            "c": 0.1,
+            "c": 0.9,
             "theta3": -0.1,
             "theta4": theta48,
             "theta5": 1e-4
         },
         "PLASMID 10": {
-            "c": 0.1,
+            "c": 0.01,
             "theta3": -0.1,
             "theta4": theta49,
             "theta5": 1e-4
@@ -195,8 +195,7 @@ if __name__ == "__main__":
         theta5 = params["theta5"]
         # Adjust initial E value dynamically based on theta4
         y0_scenario = [N0, S0, (theta4), F0, H0, 1.4, 0.0]
-        
-        sol_scenario = solve_ivp(ode_system, t_span, y0_scenario, args=(theta4,), t_eval=t_eval,
+        sol_scenario = solve_ivp(ode_system, t_span, y0_scenario, args=(theta2, theta3, theta5, c, theta4), t_eval=t_eval,
                                 method="RK45", rtol=1e-6, atol=1e-9)
         solutions[name] = sol_scenario
 
@@ -214,7 +213,6 @@ if __name__ == "__main__":
     plt.ylabel("dN/dt")
     plt.grid(True)
     plt.legend()
-    plt.tight_layout()
     plt.show()
 
     # plot all state variables for each scenario using subplots
@@ -227,5 +225,4 @@ if __name__ == "__main__":
         axs[i].grid(True)
     axs[-1].set_xlabel("Time (hours)")
     plt.suptitle("State Variables for Plasmid Scenarios")
-    plt.tight_layout(rect=[0, 0, 1, 0.96])
     plt.show()
