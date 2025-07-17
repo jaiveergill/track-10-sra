@@ -75,25 +75,24 @@ def baseline_drift(pH, temp,
 theta4 = baseline_drift(PH_OPT, TEMP_OPT)
 
 #O DE SYSTEM DEFINITION
-def ode_system(t, y, theta4=theta4):
+def ode_system(t, y, theta2_=theta2, theta3_=theta3, theta5_=theta5, c_=c, theta4_val=theta4):
+    """
+    need big docstring here
+    """
     N, S, E, F, H, B, y_dummy = y
-    dB_dt = bile_salt_derivative(y_dummy) # bile and its rate of change at time t
-    #substrate dynamics
-    dS_dt = theta1 * N * S / (K_S + S) * mu_max + theta2 * dB_dt  #consumption + bile-driven input
-    #growth rate 
+    dB_dt = bile_salt_derivative(y_dummy)
+    dS_dt = theta1 * N * S / (K_S + S) * mu_max + theta2_ * dB_dt
     dN_dt = mu_max * N * F * (S / (K_S + S)) - epsilon * dS_dt
-    #HGT environment factor
-    dE_dt = theta3 * dB_dt * (theta4)
-    #plasmid-free factor
-    dF_dt = H * (1 - E) * (1 - c) - F * 0.15 #  linear decay term
-    #host factor
-    dH_dt = theta5 * N * S/(K_S + S) 
+    dE_dt = theta3_ * dB_dt * theta4_val
+    dF_dt = H * (1 - E) * (1 - c_) - F * 0.15
+    dH_dt = theta5_ * N * S/(K_S + S)
     dy_dummy_dt = 1.0
     return [dN_dt, dS_dt, dE_dt, dF_dt, dH_dt, dB_dt, dy_dummy_dt]
 
-#integrating from t=0 to t=48 hours
-t_span = (0, 96)
-t_eval = np.linspace(0, 96, 1000)
+days = 3
+# integrating from t=0 to t=days*24 hours
+t_span = (0, 24*days)
+t_eval = np.linspace(0, 24*days, 1000)
 sol = solve_ivp(ode_system, t_span, y0, t_eval=t_eval, dense_output=False, method="BDF")
 
 # Plot all state variables for the base simulation (for reference)
@@ -107,9 +106,9 @@ fig.suptitle("Base Simulation: State Variables Over 24 Hours")
 plt.tight_layout(rect=[0, 0, 1, 0.96])
 plt.show()
 
-#SCENARIO FOR CHANGING PARAMETERS 
+# SCENARIOS FOR CHANGING PARAMETERS 
 
-#generating different thetas, you can change the ph and temp
+# generating different thetas, you can change the ph and temp
 theta40 = baseline_drift(6.7, 37.0)
 theta41 = baseline_drift(6.7, 37.1)
 theta42 = baseline_drift(6.7, 37.2)
@@ -119,9 +118,9 @@ theta45 = baseline_drift(6.7, 37.5)
 theta46 = baseline_drift(6.7, 37.6)
 theta47 = baseline_drift(6.7, 37.7)
 theta48 = baseline_drift(6.7, 37.8)
-theta49 = baseline_drift(6.7, 40)
+theta49 = baseline_drift(6.7, 38)
 
-#connects to the thetas for theta4, and then you can change the c, theta3, and theta5 values
+# connects to the thetas for theta4, and then you can change the c, theta3, and theta5 values
 scenarios = {
     "PLASMID 1": {
         "c": 0.1,
@@ -185,7 +184,7 @@ scenarios = {
     },
 }
 
-#generating solutions for each scenario with modified initial condition for E0
+# generating solutions for each scenario with modified initial condition for E0
 solutions = {}
 for name, params in scenarios.items():
     c = params["c"]
@@ -199,7 +198,7 @@ for name, params in scenarios.items():
                              method="RK45", rtol=1e-6, atol=1e-9)
     solutions[name] = sol_scenario
 
-#plot the growth rate for all scenarios 
+# plot the growth rate for all scenarios 
 plt.figure(figsize=(8, 4))
 for name, sol in solutions.items():
     N_vals = sol.y[0]
@@ -216,7 +215,7 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 
-#plot all state variables for each scenario using subplots
+# plot all state variables for each scenario using subplots
 fig, axs = plt.subplots(len(labels), 1, figsize=(8, 2*len(labels)), sharex=True)
 for i, label in enumerate(labels):
     for scenario, sol_scenario in solutions.items():
