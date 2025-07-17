@@ -7,12 +7,12 @@ def run_grid_search(param_ranges):
     F0_const = 0.9
     N0_, S0_, H0_ = N0, S0, H0
     other = [1.4, 0.0]
-    c_vals    = param_ranges.get('c', [0.05, 0.15])
-    pH_vals   = param_ranges.get('pH', [6.5, 6.9])
-    temp_vals = param_ranges.get('temp', [36.0, 38.0])
-    theta2_vals = param_ranges.get('theta2', [0.05, 0.12])
-    theta3_vals = param_ranges.get('theta3', [-0.15, -0.05])
-    theta5_vals = param_ranges.get('theta5', [5e-5, 1.5e-4])
+    c_vals = param_ranges['c']
+    pH_vals = param_ranges['pH']
+    temp_vals = param_ranges['temp']
+    theta2_vals = param_ranges['theta2']
+    theta3_vals = param_ranges['theta3']
+    theta5_vals = param_ranges['theta5']
     
     scenarios = {}
     count = 0
