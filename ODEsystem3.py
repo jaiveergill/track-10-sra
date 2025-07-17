@@ -3,8 +3,7 @@ from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 from generate_bile_salt_params import param_sin_func
 
-#BILE SALT MODEL
-
+# BILE SALT MODEL
 best_parameters = np.load("params/best_parameters.npy")
 def sum8_sin_func(t, parameters=best_parameters):
     sin1 = param_sin_func(t, parameters[:3])
@@ -26,42 +25,37 @@ def bile_salt_derivative(y_dummy):
 
 #PARAMETER DEFINITIONS
 
-#max growth rate, in 1/h,
-mu_max = 0.3    
-#carrying capacity (normalized)
-K = 1.0    
-#yield coefficient (biomass per substrate) (0.45-0.6)     
-Y = 0.5       
-#coupling of substrate change to growth
-epsilon = 0.05 
-#-2.0 with Y=0.5
-theta1 = -1.0 / Y  
-#bile influence on substrate
-theta2 = 0.09
-#bile influence on HGT environment (negative = inhibitory)
-theta3 = -0.1  
-#coupling for H factor, potentially need to change this to also account for ph and temp on HGT
-theta5 = 1e-4
-#plasmid metabolic cost
-c = 0.1         
+mu_max = 0.3 # max growth rate, in 1/h,
 
-#INITIAL CONDITIONS
+epsilon = 0.05 # rate of population leaving with human meal times
+ 
+Y = 0.5 # biomass yield coefficient
+theta1 = -1.0 / Y # rate of substrate consumption
+theta2 = 0.09 # bile influence on substrate influx
+theta3 = -0.1  # bile influence on HGT environment (negative = inhibitory)
+theta5 = 0.3 # environemental effects on HGT
+c = 0.1 # plasmid metabolic cost
 
-N0 = 0.1; S0 = 1.1; E0 = 0.5; F0 = 0.9; H0 = 0.5
-y0 = [N0, S0, E0, F0, H0, 1.4, 0.0]
 
-#THETA FOUR FUNCTION 
+# INITIAL CONDITIONS
+N0 = 0.1;
+S0 = 1.1;
+E0 = 0.5;
+F0 = 0.9;
+H0 = 0.5;
+B0 = 1.4;
+y0 = [N0, S0, E0, F0, H0, B0, 0.0] # 0.0 represent initial value of y_dummy 
 
-# physiological optima
-PH_OPT       = 6.8
-TEMP_OPT     = 37.0
-K_S = 1
+# physiological optimum conditions
+PH_OPT = 6.8
+TEMP_OPT = 37.0
+K_S = 1 # half-concentration constant
 
-#width of sensitivity
-SIGMA_PH_DR  = 0.5   #pH units
-SIGMA_TEMP_DR= 5.0   #°C
+# width of sensitivity for the Gaussian
+SIGMA_PH_DR  = 0.5   # pH units
+SIGMA_TEMP_DR= 5.0   # deg C
 
-#peak baseline environmental drift at the optimum
+# peak baseline environmental drift at the optimum conditions
 THETA4_MAX   = 0.5
 
 def baseline_drift(pH, temp,
@@ -70,21 +64,20 @@ def baseline_drift(pH, temp,
                    temp_opt=TEMP_OPT, sigma_temp=SIGMA_TEMP_DR):
     """
     Returns a baseline environmental drift term (theta4) that is
-    maximal (= theta4_max) at (pH_opt, temp_opt) and declines
-    in a Gaussian manner as you move away.
+    maximum (theta4_max) at (pH_opt, temp_opt) and declines
+    in a Gaussian manner as you move away from optimal conditions.
     """
     ph_term   = np.exp(-((pH - pH_opt)**2)    / (2 * sigma_pH**2))
     temp_term = np.exp(-((temp - temp_opt)**2)/(2 * sigma_temp**2))
-    return 1-theta4_max * ph_term * temp_term
+    return 1-theta4_max * ph_term * temp_term # "1 -"  is done since a value farther from the optimum should be closer to 1 to scale environemental stress
 
-#setting the base conditions at optimal environment
+# setting the base conditions at optimal environment
 theta4 = baseline_drift(PH_OPT, TEMP_OPT)
 
-#ODE SYSTEM DEFINITION
+#O DE SYSTEM DEFINITION
 def ode_system(t, y, theta4=theta4):
     N, S, E, F, H, B, y_dummy = y
-    #bile and its rate of change at time t
-    dB_dt = bile_salt_derivative(y_dummy)
+    dB_dt = bile_salt_derivative(y_dummy) # bile and its rate of change at time t
     #substrate dynamics
     dS_dt = theta1 * N * S / (K_S + S) * mu_max + theta2 * dB_dt  #consumption + bile-driven input
     #growth rate 
