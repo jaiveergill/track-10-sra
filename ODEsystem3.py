@@ -65,8 +65,8 @@ def baseline_drift(pH, temp,
     return theta4_max * ph_term * temp_term
 
 #testing conditions
-ENV_pH   = 7.0   
-ENV_temp = 38.5
+ENV_pH   = 6.8   
+ENV_temp = 38.0
 theta4 = baseline_drift(ENV_pH, ENV_temp)
 
 #ODE system definition
@@ -130,7 +130,7 @@ for name, params in scenarios.items():
     theta4 = params["theta4"]
     theta5 = params["theta5"]
     # Adjust initial E value dynamically based on theta4
-    y0_scenario = [N0, S0, (1 - theta4)*10, F0, H0, 1.4, 0.0]
+    y0_scenario = [N0, S0, (1 - theta4), F0, H0, 1.4, 0.0]
     
     sol_scenario = solve_ivp(ode_system, t_span, y0_scenario, t_eval=t_eval,
                              method="RK45", rtol=1e-6, atol=1e-9)
