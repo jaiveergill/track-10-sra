@@ -28,28 +28,6 @@ def run_grid_search(param_ranges):
     print("Total scenarios run:", count)
     return scenarios
 
-def graph_outputs(scenarios):
-    params_to_plot = ['c', 'pH', 'temp', 'theta2', 'theta3', 'theta5']
-    num_plots = len(params_to_plot)
-    fig, axs = plt.subplots(num_plots, 1, figsize=(6, 4 * num_plots))
-    if num_plots == 1:
-        axs = [axs]
-    for i, param in enumerate(params_to_plot):
-        x_data = []
-        y_data = []
-        for key, scenario in scenarios.items():
-            param_value = scenario['parameters'][param]
-            sol = scenario['solution']
-            final_N = sol.y[0, -1]
-            x_data.append(param_value)
-            y_data.append(final_N)
-        axs[i].scatter(x_data, y_data)
-        axs[i].set_xlabel(param)
-        axs[i].set_ylabel("Final N")
-        axs[i].set_title(f"Effect of {param} on Final N")
-    plt.tight_layout()
-    plt.show()
-
 if __name__ == "__main__":
     param_ranges = {
         'c': [0.05, 0.10, 0.15],
