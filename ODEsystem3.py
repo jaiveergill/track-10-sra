@@ -40,7 +40,7 @@ theta1 = -1.0 / Y
 theta2 = 0.09
 #bile influence on HGT environment (negative = inhibitory)
 theta3 = -0.1  
-#coupling for H factor
+#coupling for H factor, potentially need to change this to also account for ph and temp on HGT
 theta5 = 1e-4
 #plasmid metabolic cost
 c = 0.1         
@@ -94,13 +94,13 @@ def ode_system(t, y, theta4=theta4):
     #plasmid-free factor
     dF_dt = H * (1 - E) * (1 - c) - F * 0.15 #  linear decay term
     #host factor
-    dH_dt = theta5 * N * S/(K_S + S) * (1-E)
+    dH_dt = theta5 * N * S/(K_S + S) 
     dy_dummy_dt = 1.0
     return [dN_dt, dS_dt, dE_dt, dF_dt, dH_dt, dB_dt, dy_dummy_dt]
 
 #integrating from t=0 to t=48 hours
-t_span = (0, 48)
-t_eval = np.linspace(0, 48, 1000)
+t_span = (0, 96)
+t_eval = np.linspace(0, 96, 1000)
 sol = solve_ivp(ode_system, t_span, y0, t_eval=t_eval, dense_output=False, method="BDF")
 
 # Plot all state variables for the base simulation (for reference)
