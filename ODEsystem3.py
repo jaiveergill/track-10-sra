@@ -59,10 +59,10 @@ K_S = 1
 
 #width of sensitivity
 SIGMA_PH_DR  = 0.5   #pH units
-SIGMA_TEMP_DR= 2.0   #°C
+SIGMA_TEMP_DR= 5.0   #°C
 
 #peak baseline environmental drift at the optimum
-THETA4_MAX   = 0.325
+THETA4_MAX   = 0.5
 
 def baseline_drift(pH, temp,
                    theta4_max=THETA4_MAX,
@@ -75,13 +75,13 @@ def baseline_drift(pH, temp,
     """
     ph_term   = np.exp(-((pH - pH_opt)**2)    / (2 * sigma_pH**2))
     temp_term = np.exp(-((temp - temp_opt)**2)/(2 * sigma_temp**2))
-    return theta4_max * ph_term * temp_term
+    return 1-theta4_max * ph_term * temp_term
 
 #setting the base conditions at optimal environment
 theta4 = baseline_drift(PH_OPT, TEMP_OPT)
 
 #ODE SYSTEM DEFINITION
-def ode_system(t, y):
+def ode_system(t, y, theta4=theta4):
     N, S, E, F, H, B, y_dummy = y
     #bile and its rate of change at time t
     dB_dt = bile_salt_derivative(y_dummy)
@@ -90,7 +90,7 @@ def ode_system(t, y):
     #growth rate 
     dN_dt = mu_max * N * F * (S / (K_S + S)) - epsilon * dS_dt
     #HGT environment factor
-    dE_dt = theta3 * dB_dt
+    dE_dt = theta3 * dB_dt * (theta4)
     #plasmid-free factor
     dF_dt = H * (1 - E) * (1 - c) - F * 0.15 #  linear decay term
     #host factor
@@ -126,7 +126,7 @@ theta45 = baseline_drift(6.7, 37.5)
 theta46 = baseline_drift(6.7, 37.6)
 theta47 = baseline_drift(6.7, 37.7)
 theta48 = baseline_drift(6.7, 37.8)
-theta49 = baseline_drift(6.7, 37.9)
+theta49 = baseline_drift(6.7, 40)
 
 #connects to the thetas for theta4, and then you can change the c, theta3, and theta5 values
 scenarios = {
@@ -200,9 +200,9 @@ for name, params in scenarios.items():
     theta4 = params["theta4"]
     theta5 = params["theta5"]
     # Adjust initial E value dynamically based on theta4
-    y0_scenario = [N0, S0, (1 - theta4), F0, H0, 1.4, 0.0]
+    y0_scenario = [N0, S0, (theta4), F0, H0, 1.4, 0.0]
     
-    sol_scenario = solve_ivp(ode_system, t_span, y0_scenario, t_eval=t_eval,
+    sol_scenario = solve_ivp(ode_system, t_span, y0_scenario, args=(theta4,), t_eval=t_eval,
                              method="RK45", rtol=1e-6, atol=1e-9)
     solutions[name] = sol_scenario
 
