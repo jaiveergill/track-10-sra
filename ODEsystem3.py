@@ -93,137 +93,139 @@ days = 3
 # integrating from t=0 to t=days*24 hours
 t_span = (0, 24*days)
 t_eval = np.linspace(0, 24*days, 1000)
-sol = solve_ivp(ode_system, t_span, y0, t_eval=t_eval, dense_output=False, method="BDF")
 
-# Plot all state variables for the base simulation (for reference)
-labels = ['N', 'S', 'E', 'F', 'H', 'B', 'y_dummy']
-fig, axs = plt.subplots(len(labels), 1, figsize=(8, 2*len(labels)), sharex=True)
-for i, label in enumerate(labels):
-    axs[i].plot(sol.t, sol.y[i], label=label)
-    axs[i].set_ylabel(label)
-axs[-1].set_xlabel("Time (hours)")
-fig.suptitle("Base Simulation: State Variables Over 24 Hours")
-plt.tight_layout(rect=[0, 0, 1, 0.96])
-plt.show()
+if __name__ == "__main__":
+    sol = solve_ivp(ode_system, t_span, y0, t_eval=t_eval, dense_output=False, method="BDF")
 
-# SCENARIOS FOR CHANGING PARAMETERS 
+    # Plot all state variables for the base simulation (for reference)
+    labels = ['N', 'S', 'E', 'F', 'H', 'B', 'y_dummy']
+    fig, axs = plt.subplots(len(labels), 1, figsize=(8, 2*len(labels)), sharex=True)
+    for i, label in enumerate(labels):
+        axs[i].plot(sol.t, sol.y[i], label=label)
+        axs[i].set_ylabel(label)
+    axs[-1].set_xlabel("Time (hours)")
+    fig.suptitle("Base Simulation: State Variables Over 24 Hours")
+    plt.tight_layout(rect=[0, 0, 1, 0.96])
+    plt.show()
 
-# generating different thetas, you can change the ph and temp
-theta40 = baseline_drift(6.7, 37.0)
-theta41 = baseline_drift(6.7, 37.1)
-theta42 = baseline_drift(6.7, 37.2)
-theta43 = baseline_drift(6.7, 37.3)
-theta44 = baseline_drift(6.7, 37.4)
-theta45 = baseline_drift(6.7, 37.5)
-theta46 = baseline_drift(6.7, 37.6)
-theta47 = baseline_drift(6.7, 37.7)
-theta48 = baseline_drift(6.7, 37.8)
-theta49 = baseline_drift(6.7, 38)
+    # SCENARIOS FOR CHANGING PARAMETERS 
 
-# connects to the thetas for theta4, and then you can change the c, theta3, and theta5 values
-scenarios = {
-    "PLASMID 1": {
-        "c": 0.1,
-        "theta3": -0.1,
-        "theta4": theta40,
-        "theta5": 1e-4
-    },
-    "PLASMID 2": {
-        "c": 0.1,
-        "theta3": -0.1,
-        "theta4": theta41,
-        "theta5": 1e-4
-    },
-    "PLASMID 3": {
-        "c": 0.1,
-        "theta3": -0.1,
-        "theta4": theta42,
-        "theta5": 1e-4
-    },
-    "PLASMID 4": {
-        "c": 0.1,
-        "theta3": -0.1,
-        "theta4": theta43,
-        "theta5": 1e-4
-    },
-    "PLASMID 5": {
-        "c": 0.1,
-        "theta3": -0.1,
-        "theta4": theta44,
-        "theta5": 1e-4
-    },
-    "PLASMID 6": {
-        "c": 0.1,
-        "theta3": -0.1,
-        "theta4": theta45,
-        "theta5": 1e-4
-    },
-    "PLASMID 7": {
-        "c": 0.1,
-        "theta3": -0.1,
-        "theta4": theta46,
-        "theta5": 1e-4
-    },
-    "PLASMID 8": {
-        "c": 0.1,
-        "theta3": -0.1,
-        "theta4": theta47,
-        "theta5": 1e-4
-    },
-    "PLASMID 9": {
-        "c": 0.1,
-        "theta3": -0.1,
-        "theta4": theta48,
-        "theta5": 1e-4
-    },
-    "PLASMID 10": {
-        "c": 0.1,
-        "theta3": -0.1,
-        "theta4": theta49,
-        "theta5": 1e-4
-    },
-}
+    # generating different thetas, you can change the ph and temp
+    theta40 = baseline_drift(6.7, 37.0)
+    theta41 = baseline_drift(6.7, 37.1)
+    theta42 = baseline_drift(6.7, 37.2)
+    theta43 = baseline_drift(6.7, 37.3)
+    theta44 = baseline_drift(6.7, 37.4)
+    theta45 = baseline_drift(6.7, 37.5)
+    theta46 = baseline_drift(6.7, 37.6)
+    theta47 = baseline_drift(6.7, 37.7)
+    theta48 = baseline_drift(6.7, 37.8)
+    theta49 = baseline_drift(6.7, 38)
 
-# generating solutions for each scenario with modified initial condition for E0
-solutions = {}
-for name, params in scenarios.items():
-    c = params["c"]
-    theta3 = params["theta3"]
-    theta4 = params["theta4"]
-    theta5 = params["theta5"]
-    # Adjust initial E value dynamically based on theta4
-    y0_scenario = [N0, S0, (theta4), F0, H0, 1.4, 0.0]
-    
-    sol_scenario = solve_ivp(ode_system, t_span, y0_scenario, args=(theta4,), t_eval=t_eval,
-                             method="RK45", rtol=1e-6, atol=1e-9)
-    solutions[name] = sol_scenario
+    # connects to the thetas for theta4, and then you can change the c, theta3, and theta5 values
+    scenarios = {
+        "PLASMID 1": {
+            "c": 0.1,
+            "theta3": -0.1,
+            "theta4": theta40,
+            "theta5": 1e-4
+        },
+        "PLASMID 2": {
+            "c": 0.1,
+            "theta3": -0.1,
+            "theta4": theta41,
+            "theta5": 1e-4
+        },
+        "PLASMID 3": {
+            "c": 0.1,
+            "theta3": -0.1,
+            "theta4": theta42,
+            "theta5": 1e-4
+        },
+        "PLASMID 4": {
+            "c": 0.1,
+            "theta3": -0.1,
+            "theta4": theta43,
+            "theta5": 1e-4
+        },
+        "PLASMID 5": {
+            "c": 0.1,
+            "theta3": -0.1,
+            "theta4": theta44,
+            "theta5": 1e-4
+        },
+        "PLASMID 6": {
+            "c": 0.1,
+            "theta3": -0.1,
+            "theta4": theta45,
+            "theta5": 1e-4
+        },
+        "PLASMID 7": {
+            "c": 0.1,
+            "theta3": -0.1,
+            "theta4": theta46,
+            "theta5": 1e-4
+        },
+        "PLASMID 8": {
+            "c": 0.1,
+            "theta3": -0.1,
+            "theta4": theta47,
+            "theta5": 1e-4
+        },
+        "PLASMID 9": {
+            "c": 0.1,
+            "theta3": -0.1,
+            "theta4": theta48,
+            "theta5": 1e-4
+        },
+        "PLASMID 10": {
+            "c": 0.1,
+            "theta3": -0.1,
+            "theta4": theta49,
+            "theta5": 1e-4
+        },
+    }
 
-# plot the growth rate for all scenarios 
-plt.figure(figsize=(8, 4))
-for name, sol in solutions.items():
-    N_vals = sol.y[0]
-    S_vals = sol.y[1]
-    dB_vals = bile_salt_derivative(sol.y[6])
-    dS_vals = theta1 * N_vals * S_vals / (1 + S_vals) * mu_max + theta2 * dB_vals
-    growth_rate = mu_max * N_vals * sol.y[3] * (S_vals / (1 + S_vals)) - epsilon * dS_vals
-    plt.plot(sol.t, growth_rate, linewidth=2, label=name)
-plt.title("Growth Rate Across Scenarios")
-plt.xlabel("Time (hours)")
-plt.ylabel("dN/dt")
-plt.grid(True)
-plt.legend()
-plt.tight_layout()
-plt.show()
+    # generating solutions for each scenario with modified initial condition for E0
+    solutions = {}
+    for name, params in scenarios.items():
+        c = params["c"]
+        theta3 = params["theta3"]
+        theta4 = params["theta4"]
+        theta5 = params["theta5"]
+        # Adjust initial E value dynamically based on theta4
+        y0_scenario = [N0, S0, (theta4), F0, H0, 1.4, 0.0]
+        
+        sol_scenario = solve_ivp(ode_system, t_span, y0_scenario, args=(theta4,), t_eval=t_eval,
+                                method="RK45", rtol=1e-6, atol=1e-9)
+        solutions[name] = sol_scenario
 
-# plot all state variables for each scenario using subplots
-fig, axs = plt.subplots(len(labels), 1, figsize=(8, 2*len(labels)), sharex=True)
-for i, label in enumerate(labels):
-    for scenario, sol_scenario in solutions.items():
-        axs[i].plot(sol_scenario.t, sol_scenario.y[i], label=scenario)
-    axs[i].set_ylabel(label)
-    axs[i].legend()
-    axs[i].grid(True)
-axs[-1].set_xlabel("Time (hours)")
-plt.suptitle("State Variables for Plasmid Scenarios")
-plt.tight_layout(rect=[0, 0, 1, 0.96])
-plt.show()
+    # plot the growth rate for all scenarios 
+    plt.figure(figsize=(8, 4))
+    for name, sol in solutions.items():
+        N_vals = sol.y[0]
+        S_vals = sol.y[1]
+        dB_vals = bile_salt_derivative(sol.y[6])
+        dS_vals = theta1 * N_vals * S_vals / (1 + S_vals) * mu_max + theta2 * dB_vals
+        growth_rate = mu_max * N_vals * sol.y[3] * (S_vals / (1 + S_vals)) - epsilon * dS_vals
+        plt.plot(sol.t, growth_rate, linewidth=2, label=name)
+    plt.title("Growth Rate Across Scenarios")
+    plt.xlabel("Time (hours)")
+    plt.ylabel("dN/dt")
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+    # plot all state variables for each scenario using subplots
+    fig, axs = plt.subplots(len(labels), 1, figsize=(8, 2*len(labels)), sharex=True)
+    for i, label in enumerate(labels):
+        for scenario, sol_scenario in solutions.items():
+            axs[i].plot(sol_scenario.t, sol_scenario.y[i], label=scenario)
+        axs[i].set_ylabel(label)
+        axs[i].legend()
+        axs[i].grid(True)
+    axs[-1].set_xlabel("Time (hours)")
+    plt.suptitle("State Variables for Plasmid Scenarios")
+    plt.tight_layout(rect=[0, 0, 1, 0.96])
+    plt.show()

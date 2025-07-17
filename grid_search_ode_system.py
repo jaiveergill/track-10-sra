@@ -2,6 +2,7 @@ from ODEsystem3 import *
 import numpy as np
 import matplotlib.pyplot as plt
 from itertools import product
+import pickle
 
 def run_grid_search(param_ranges):
     F0_const = 0.9
@@ -38,3 +39,4 @@ if __name__ == "__main__":
         'theta5': [5e-5, 1e-4, 1.5e-4]
     }
     scenarios = run_grid_search(param_ranges)
+    pickle.dump(scenarios, open("scenarios_01.pickle", "ab"))
