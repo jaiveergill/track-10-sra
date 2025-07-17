@@ -1,8 +1,3 @@
-"""
-Grid search script: Runs through all scenarios based on input parameter ranges.
-E0 is computed from baseline_drift(pH, temp) and F0 is fixed.
-"""
-
 from ODEsystem3 import *
 import numpy as np
 import matplotlib.pyplot as plt
