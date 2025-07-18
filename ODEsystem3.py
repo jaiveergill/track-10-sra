@@ -110,81 +110,154 @@ if __name__ == "__main__":
 
     # SCENARIOS FOR CHANGING PARAMETERS 
 
-    # generating different thetas, you can change the ph and temp
-    theta40 = baseline_drift(6.7, 37.0)
-    theta41 = baseline_drift(6.7, 37.1)
-    theta42 = baseline_drift(6.7, 37.2)
-    theta43 = baseline_drift(6.7, 37.3)
-    theta44 = baseline_drift(6.7, 37.4)
-    theta45 = baseline_drift(6.7, 37.5)
-    theta46 = baseline_drift(6.7, 37.6)
-    theta47 = baseline_drift(6.7, 37.7)
-    theta48 = baseline_drift(6.7, 37.8)
-    theta49 = baseline_drift(6.7, 38)
+#generating different thetas, you can change the ph and temp
 
-    # connects to the thetas for theta4, and then you can change the c, theta3, and theta5 values
-    scenarios = {
-        "PLASMID 1": {
-            "c": 0.1,
-            "theta3": -0.1,
-            "theta4": theta40,
-            "theta5": 1e-4
-        },
-        "PLASMID 2": {
-            "c": 0.1,
-            "theta3": -0.1,
-            "theta4": theta41,
-            "theta5": 1e-4
-        },
-        "PLASMID 3": {
-            "c": 0.1,
-            "theta3": -0.1,
-            "theta4": theta42,
-            "theta5": 1e-4
-        },
-        "PLASMID 4": {
-            "c": 0.1,
-            "theta3": -0.1,
-            "theta4": theta43,
-            "theta5": 1e-4
-        },
-        "PLASMID 5": {
-            "c": 0.1,
-            "theta3": -0.1,
-            "theta4": theta44,
-            "theta5": 1e-4
-        },
-        "PLASMID 6": {
-            "c": 0.1,
-            "theta3": -0.1,
-            "theta4": theta45,
-            "theta5": 1e-4
-        },
-        "PLASMID 7": {
-            "c": 0.1,
-            "theta3": -0.1,
-            "theta4": theta46,
-            "theta5": 1e-4
-        },
-        "PLASMID 8": {
-            "c": 0.1,
-            "theta3": -0.1,
-            "theta4": theta47,
-            "theta5": 1e-4
-        },
-        "PLASMID 9": {
-            "c": 0.9,
-            "theta3": -0.1,
-            "theta4": theta48,
-            "theta5": 1e-4
-        },
-        "PLASMID 10": {
-            "c": 0.01,
-            "theta3": -0.1,
-            "theta4": theta49,
-            "theta5": 1e-4
-        },
-    }
+#changing temp
+theta41 = baseline_drift(6.7, 36.0)
+theta42 = baseline_drift(6.7, 37.0)
+theta43 = baseline_drift(6.7, 38.0)
+
+#changing pH
+theta44 = baseline_drift(6.2, 37.0)
+theta45 = baseline_drift(6.7, 37.0)
+theta46 = baseline_drift(7.2, 37.0)
+
+theta47 = baseline_drift(6.7, 37.0)
+theta48 = baseline_drift(6.7, 37.0)
+theta49 = baseline_drift(6.7, 37.0)
+theta410 = baseline_drift(6.7, 37.0)
+theta411 = baseline_drift(6.7, 37.0)
+theta412 = baseline_drift(6.7, 37.0)
+theta413 = baseline_drift(6.7, 37.0)
+theta414 = baseline_drift(6.7, 37.0)
+theta415 = baseline_drift(6.7, 37.0)
+
+#connects to the thetas for theta4, and then you can change the c, theta3, and theta5 values
+scenarios = {
+    #changing temp
+    "p1": {
+        "c": c,
+        "theta3": theta3,
+        "theta4": theta41,
+        "theta5": theta5
+    },
+    "p2": {
+        "c": c,
+        "theta3": theta3,
+        "theta4": theta42,
+        "theta5": theta5
+    },
+    "p3": {
+       "c": c,
+        "theta3": theta3,
+        "theta4": theta43,
+        "theta5": theta5
+    },
+    #changing pH
+    "p4": {
+        "c": c,
+        "theta3": theta3,
+        "theta4": theta44,
+        "theta5": theta5
+    },
+    "p5": {
+        "c": c,
+        "theta3": theta3,
+        "theta4": theta45,
+        "theta5": theta5
+    },
+    "p6": {
+        "c": c,
+        "theta3": theta3,
+        "theta4": theta46,
+        "theta5": theta5
+    },
+    #changing c
+    "p7": {
+        "c": c-0.1,
+        "theta3": theta3,
+        "theta4": theta47,
+        "theta5": theta5
+    },
+    "p8": {
+        "c": c,
+        "theta3": theta3,
+        "theta4": theta48,
+        "theta5": theta5
+    },
+    "p9": {
+        "c": c+0.1,
+        "theta3": theta3,
+        "theta4": theta49,
+        "theta5": theta5
+    },
+    #changing theta3
+    "p10": {
+        "c": c,
+        "theta3": theta3+0.05,
+        "theta4": theta410,
+        "theta5": theta5
+    },
+     "p11": {
+        "c": c,
+        "theta3": theta3,
+        "theta4": theta411,
+        "theta5": theta5
+    },
+    "p12": {
+        "c": c,
+        "theta3": theta3-0.05,
+        "theta4": theta412,
+        "theta5": theta5
+    },
+    #changing theta5
+     "p13": {
+        "c": c,
+        "theta3": theta3,
+        "theta4": theta413,
+        "theta5": 1e-4
+    },
+     "p14": {
+        "c": c,
+        "theta3": theta3,
+        "theta4": theta414,
+        "theta5": 1e-3
+    },
+     "p15": {
+        "c": c,
+        "theta3": theta3,
+        "theta4": theta415,
+        "theta5": 1e-2
+    },
+}
+
+colormap = {
+    #changing pH
+    "p1":  "#deebf7",  # light blue
+    "p2":  "#9ecae1",  # medium blue
+    "p3":  "#3182bd",  # dark blue
+
+    #changing temp
+    "p4":  "#fde0dd",  # light pink
+    "p5":  "#fa9fb5",  # medium pink
+    "p6":  "#c51b8a",  # dark pink
+
+    #changing c
+    "p7":  "#e5f5e0",  # light green
+    "p8":  "#a1d99b",  # medium green
+    "p9":  "#31a354",  # dark green
+
+    #changing theta3
+    "p10": "#fcbba1",  # light red
+    "p11": "#fb6a4a",  # medium red
+    "p12": "#cb181d",  # dark red
+
+    #changing theta5
+    "p13": "#efedf5",  # light purple
+    "p14": "#bcbddc",  # medium purple
+    "p15": "#756bb1",  # dark purple
+}
+
 
     # generating solutions for each scenario with modified initial condition for E0
     solutions = {}
@@ -199,30 +272,44 @@ if __name__ == "__main__":
                                 method="RK45", rtol=1e-6, atol=1e-9)
         solutions[name] = sol_scenario
 
-    # plot the growth rate for all scenarios 
-    plt.figure(figsize=(8, 4))
-    for name, sol in solutions.items():
-        N_vals = sol.y[0]
-        S_vals = sol.y[1]
-        dB_vals = bile_salt_derivative(sol.y[6])
-        dS_vals = theta1 * N_vals * S_vals / (1 + S_vals) * mu_max + theta2 * dB_vals
-        growth_rate = mu_max * N_vals * sol.y[3] * (S_vals / (1 + S_vals)) - epsilon * dS_vals
-        plt.plot(sol.t, growth_rate, linewidth=2, label=name)
-    plt.title("Growth Rate Across Scenarios")
-    plt.xlabel("Time (hours)")
-    plt.ylabel("dN/dt")
-    plt.grid(True)
-    plt.legend()
-    plt.show()
+#plot the growth rate for all scenarios 
+plt.figure(figsize=(8, 4))
+for name, sol in solutions.items():
+    N_vals = sol.y[0]
+    S_vals = sol.y[1]
+    dB_vals = bile_salt_derivative(sol.y[6])
+    dS_vals = theta1 * N_vals * S_vals / (1 + S_vals) * mu_max + theta2 * dB_vals
+    growth_rate = mu_max * N_vals * sol.y[3] * (S_vals / (1 + S_vals)) - epsilon * dS_vals
+    plt.plot(sol.t, growth_rate, color=colormap[name], linewidth=2, label=name)
+plt.title("Growth Rate Across Scenarios")
+plt.xlabel("Time (hours)")
+plt.ylabel("dN/dt")
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+plt.show()
 
-    # plot all state variables for each scenario using subplots
-    fig, axs = plt.subplots(len(labels), 1, figsize=(8, 2*len(labels)), sharex=True)
-    for i, label in enumerate(labels):
-        for scenario, sol_scenario in solutions.items():
-            axs[i].plot(sol_scenario.t, sol_scenario.y[i], label=scenario)
-        axs[i].set_ylabel(label)
-        axs[i].legend()
-        axs[i].grid(True)
-    axs[-1].set_xlabel("Time (hours)")
-    plt.suptitle("State Variables for Plasmid Scenarios")
-    plt.show()
+#plotting N(t) for all plasmid scenarios 
+plt.figure(figsize=(8, 4))
+for name, sol in solutions.items():
+    plt.plot(sol.t, sol.y[0], label=name, color=colormap[name], linewidth=2)
+plt.title("Population Size N(t) Across Plasmid Scenarios")
+plt.xlabel("Time (hours)") 
+plt.ylabel("Population N")
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+#plot all state variables for each scenario using subplots
+fig, axs = plt.subplots(len(labels), 1, figsize=(8, 2*len(labels)), sharex=True)
+for i, label in enumerate(labels): 
+    for name, sol_scenario in solutions.items():
+        axs[i].plot(sol_scenario.t, sol_scenario.y[i], color=colormap[name], label=name)
+    axs[i].set_ylabel(label)
+    axs[i].legend()
+    axs[i].grid(True)
+axs[-1].set_xlabel("Time (hours)")
+plt.suptitle("State Variables for Plasmid Scenarios")
+plt.show()
+
