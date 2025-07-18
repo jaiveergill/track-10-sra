@@ -108,28 +108,35 @@ if __name__ == "__main__":
     plt.tight_layout(rect=[0, 0, 1, 0.96])
     plt.show()
 
-    # SCENARIOS FOR CHANGING PARAMETERS 
+    
+    
+# SCENARIOS FOR CHANGING PARAMETERS 
 
 #generating different thetas, you can change the ph and temp
 
 #changing temp
-theta41 = baseline_drift(6.7, 36.0)
-theta42 = baseline_drift(6.7, 36.4)
-theta43 = baseline_drift(6.7, 36.8)
-theta44 = baseline_drift(6.2, 37.2)
-theta45 = baseline_drift(6.7, 37.6)
-theta46 = baseline_drift(7.2, 38.0)
-theta47 = baseline_drift(6.7, 38.4)
+theta41 = baseline_drift(6.8, 36.0)
+theta42 = baseline_drift(6.8, 36.4)
+theta43 = baseline_drift(6.8, 36.8)
+theta44 = baseline_drift(6.8, 37.2)
+theta45 = baseline_drift(6.8, 37.6)
+theta46 = baseline_drift(6.8, 38.0)
+theta47 = baseline_drift(6.8, 38.4)
 
-#changing ph
+
 theta48 = baseline_drift(4.0, 37.0)
+
+#changing pH
 theta49 = baseline_drift(4.5, 37.0)
 theta410 = baseline_drift(5.0, 37.0)
 theta411 = baseline_drift(5.5, 37.0)
 theta412 = baseline_drift(6.0, 37.0)
 theta413 = baseline_drift(6.5, 37.0)
 theta414 = baseline_drift(7.0, 37.0)
-theta415 = baseline_drift(7.5, 37.0)
+
+#constant
+theta415 = baseline_drift(6.8, 37.0)
+
 
 #connects to the thetas for theta4, and then you can change the c, theta3, and theta5 values
 scenarios = {
@@ -173,7 +180,7 @@ scenarios = {
     },
     #changing c
     "p7": {
-        "c": c,
+        "c": c-0.1,
         "theta3": theta3,
         "theta4": theta47,
         "theta5": theta5
@@ -185,7 +192,7 @@ scenarios = {
         "theta5": theta5
     },
     "p9": {
-        "c": c,
+        "c": c+0.1,
         "theta3": theta3,
         "theta4": theta49,
         "theta5": theta5
@@ -233,62 +240,81 @@ scenarios = {
 colormap = {
     #changing pH
     "p1":  "#deebf7",  # light blue
-    "p2":  "#9ecae1",  # medium blue
-    "p3":  "#3182bd",  # dark blue
+    "p2":  "#deebf7",  # light blue
+    "p3":  "#9ecae1",  # medium blue
 
     #changing temp
-    "p4":  "#fde0dd",  # light pink
-    "p5":  "#fa9fb5",  # medium pink
-    "p6":  "#c51b8a",  # dark pink
+    "p4":  "#9ecae1",  # medium blue
+    "p5":  "#9ecae1",  # medium blue
+    "p6":  "#3182bd",  # dark blue
 
     #changing c
-    "p7":  "#e5f5e0",  # light green
-    "p8":  "#a1d99b",  # medium green
-    "p9":  "#31a354",  # dark green
+    "p7":  "#3182bd",  # dark blue
+
+    #base 
+    "p8":  "#fcbba1",  # light red
+
+
+    "p9":  "#fcbba1",  # light red
 
     #changing theta3
     "p10": "#fcbba1",  # light red
     "p11": "#fb6a4a",  # medium red
-    "p12": "#cb181d",  # dark red
+    "p12": "#fb6a4a",  # medium red
 
     #changing theta5
-    "p13": "#efedf5",  # light purple
-    "p14": "#bcbddc",  # medium purple
-    "p15": "#756bb1",  # dark purple
-
-    '''
-
-    #changing temp
-    "p1":  "#deebf7",  # light blue
-    "p2":  "#deebf7",  # light blue
-    "p3":  "#9ecae1",  # medium blue
-    "p4":  "#9ecae1",  # medium blue
-    "p5":  "#9ecae1",  # medium blue
-    "p6":  "#3182bd",  # dark blue
-    "p7":  "#3182bd",  # dark blue
-
-    #changing pH
-    "p8":  "#fcbba1",  # light red
-    "p9":  "#fcbba1",  # light red
-    "p10": "#fcbba1",  # light red
-    "p11": "#fb6a4a",  # medium red
-    "p12": "#fb6a4a",  # medium red
     "p13": "#cb181d",  # dark red
     "p14": "#cb181d",  # dark red
-    "p15": "#cb181d",  # dark red
-    '''
+    "p15": "000000",  #black
+}
+
+opacity = {
+
+    "p1":  0.5,
+    "p2":  0.5,
+    "p3":  0.5,
+    "p4":  0.5,
+    "p5":  0.5,
+    "p6":  0.5,
+    "p7":  0.5,
+    "p8":  0.5,
+    "p9":  0.5,
+    "p10": 0.5,
+    "p11": 0.5,
+    "p12": 0.5,
+    "p13": 0.5,
+    "p14": 0.5,
+    "p15": 1,
+}
+
+lw = {
+
+    "p1":  2,
+    "p2":  2,
+    "p3":  2,
+    "p4":  2,
+    "p5":  2,
+    "p6":  2,
+    "p7":  2,
+    "p8":  2,
+    "p9":  2,
+    "p10": 2,
+    "p11": 2,
+    "p12": 2,
+    "p13": 2,
+    "p14": 2,
+    "p15": 0.5,
 }
 
 
-
-    # generating solutions for each scenario with modified initial condition for E0
+ # generating solutions for each scenario with modified initial condition for E0
 solutions = {}
 for name, params in scenarios.items():
     c = params["c"]
     theta3 = params["theta3"]
     theta4 = params["theta4"]
     theta5 = params["theta5"]
-     # Adjust initial E value dynamically based on theta4
+    # Adjust initial E value dynamically based on theta4
     y0_scenario = [N0, S0, (theta4), F0, H0, 1.4, 0.0]
     sol_scenario = solve_ivp(ode_system, t_span, y0_scenario, args=(theta2, theta3, theta5, c, theta4), t_eval=t_eval,
                             method="RK45", rtol=1e-6, atol=1e-9)
@@ -302,7 +328,7 @@ for name, sol in solutions.items():
     dB_vals = bile_salt_derivative(sol.y[6])
     dS_vals = theta1 * N_vals * S_vals / (1 + S_vals) * mu_max + theta2 * dB_vals
     growth_rate = mu_max * N_vals * sol.y[3] * (S_vals / (1 + S_vals)) - epsilon * dS_vals
-    plt.plot(sol.t, growth_rate, color=colormap[name], linewidth=2, label=name)
+    plt.plot(sol.t, growth_rate, color=colormap[name], alpha=opacity[name], linewidth=lw[name], label=name)
 plt.title("Growth Rate Across Scenarios")
 plt.xlabel("Time (hours)")
 plt.ylabel("dN/dt")
@@ -314,7 +340,7 @@ plt.show()
 #plotting N(t) for all plasmid scenarios 
 plt.figure(figsize=(8, 4))
 for name, sol in solutions.items():
-    plt.plot(sol.t, sol.y[0], label=name, color=colormap[name], linewidth=2)
+    plt.plot(sol.t, sol.y[0], label=name, color=colormap[name], alpha=opacity[name], linewidth=lw[name])
 plt.title("Population Size N(t) Across Plasmid Scenarios")
 plt.xlabel("Time (hours)") 
 plt.ylabel("Population N")
@@ -327,7 +353,7 @@ plt.show()
 fig, axs = plt.subplots(len(labels), 1, figsize=(8, 2*len(labels)), sharex=True)
 for i, label in enumerate(labels): 
     for name, sol_scenario in solutions.items():
-        axs[i].plot(sol_scenario.t, sol_scenario.y[i], color=colormap[name], label=name)
+        axs[i].plot(sol_scenario.t, sol_scenario.y[i], color=colormap[name], alpha=opacity[name], linewidth=lw[name], label=name)
     axs[i].set_ylabel(label)
     axs[i].legend()
     axs[i].grid(True)
