@@ -39,7 +39,7 @@ Y = 0.5 # biomass yield coefficient
 theta1 = -1.0 / Y # rate of substrate consumption
 theta2 = 0.09 # bile influence on substrate influx
 theta3 = -0.1  # bile influence on HGT environment (negative = inhibitory)
-theta5 = 0.01 # environemental effects on HGT
+theta5 = 0.05 # environemental effects on HGT
 c = 0.1 # plasmid metabolic cost
 
 
@@ -355,7 +355,7 @@ ax.yaxis.set_minor_locator(MultipleLocator(0.2))
 ax.grid(which='minor', linestyle='-', linewidth=0.8, color='gray', alpha=0.7)
 plt.sca(ax)
 plt.xlim(0,24*days)
-plt.ylim(-0.6,0.6)
+plt.ylim(-0.8,0.8)
 plt.show()
 
 #plotting N(t) for all plasmid scenarios 

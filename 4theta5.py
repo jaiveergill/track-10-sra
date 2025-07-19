@@ -38,7 +38,7 @@ Y = 0.5 # biomass yield coefficient
 theta1 = -1.0 / Y # rate of substrate consumption
 theta2 = 0.09 # bile influence on substrate influx
 theta3 = -0.1  # bile influence on HGT environment (negative = inhibitory)
-theta5 = 0.01 # environemental effects on HGT
+theta5 = 0.05 # environemental effects on HGT
 c = 0.1 # plasmid metabolic cost
 
 
@@ -141,85 +141,85 @@ scenarios = {
         "c": c,
         "theta3": theta3,
         "theta4": theta41,
-        "theta5": 0.001
+        "theta5": 0.005
     },
     "p2": {
         "c": c,
         "theta3": theta3,
         "theta4": theta42,
-        "theta5": 0.00129155
+        "theta5": 00.015357
     },
     "p3": {
        "c": c,
         "theta3": theta3,
         "theta4": theta43,
-        "theta5": 0.0016681
+        "theta5": 0.025714
     },
     "p4": {
         "c": c,
         "theta3": theta3,
         "theta4": theta44,
-        "theta5": 0.00215443
+        "theta5": 0.036071
     },
     "p5": {
         "c": c,
         "theta3": theta3,
         "theta4": theta45,
-        "theta5": 0.00278256
+        "theta5": 0.046429
     },
     "p6": {
         "c": c,
         "theta3": theta3,
         "theta4": theta46,
-        "theta5": 0.00359381
+        "theta5": 0.067143
     },
     "p7": {
         "c": c,
         "theta3": theta3,
         "theta4": theta47,
-        "theta5": 0.00464159
+        "theta5": 0.0775
     },
     "p8": {
         "c": c,
         "theta3": theta3,
         "theta4": theta48,
-        "theta5": 0.00599343
+        "theta5": 0.087857
     },
     "p9": {
         "c": c,
         "theta3": theta3,
         "theta4": theta49,
-        "theta5": 0.00774264
+        "theta5": 0.098214
     },
     "p10": {
         "c": c,
         "theta3": theta3,
         "theta4": theta410,
-        "theta5": 0.0129155 
+        "theta5": 0.108571
     },
      "p11": {
         "c": c,
         "theta3": theta3,
         "theta4": theta411,
-        "theta5": 0.016681  
+        "theta5": 0.118929
     },
     "p12": {
         "c": c,
         "theta3": theta3,
         "theta4": theta412,
-        "theta5": 0.02154435
+        "theta5": 0.129286
     },
      "p13": {
         "c": c,
         "theta3": theta3,
         "theta4": theta413,
-        "theta5": 0.02782559
+        "theta5": 0.139643
     },
      "p14": {
         "c": c,
         "theta3": theta3,
         "theta4": theta414,
-        "theta5": 0.03593813
+        "theta5": 0.15
     },
      "p15": {
         "c": c,
@@ -311,7 +311,7 @@ for name, sol in solutions.items():
     plt.plot(sol.t, growth_rate, color=colormap[name], alpha=opacity[name], linewidth=1, label=name)
 
 #colorbar for green
-norm_temp = mcolors.Normalize(vmin=0.001, vmax=0.035)
+norm_temp = mcolors.Normalize(vmin=0.005, vmax=0.15)
 sm_temp   = cm.ScalarMappable(norm=norm_temp, cmap="YlOrRd")
 sm_temp.set_array([])
 
@@ -322,7 +322,7 @@ cax_temp = inset_axes(ax,
                       bbox_to_anchor=(0.04, 0.08, 1, 1),
                       bbox_transform=ax.transAxes)
 cbar_temp = fig.colorbar(sm_temp, cax=cax_temp, orientation="horizontal")
-cbar_temp.set_ticks([0.001, 0.035])
+cbar_temp.set_ticks([0.005, 0.15])
 cbar_temp.ax.tick_params(labelsize=9)
 cbar_temp.set_label("Theta 5", labelpad=-11, fontsize=9)
 
@@ -349,7 +349,7 @@ ax.yaxis.set_minor_locator(MultipleLocator(0.2))
 ax.grid(which='minor', linestyle='-', linewidth=0.8, color='gray', alpha=0.3)
 plt.sca(ax)
 plt.xlim(0,24*days)
-plt.ylim(-0.6,0.6)
+plt.ylim(-0.8,0.8)
 plt.show()
 
 #plotting N(t) for all plasmid scenarios 
